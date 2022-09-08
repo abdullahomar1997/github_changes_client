@@ -1,25 +1,14 @@
-import logo from './logo.svg';
 import './App.css';
+import Github from './components/Github';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Github />
+    </>
   );
 }
 
 export default App;
+
+//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
