@@ -1,5 +1,5 @@
 import React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Octokit } from "@octokit/core";
 import "../App.css";
 import Commits from "./Commits";
@@ -10,7 +10,7 @@ const Github = () => {
   const [githubUser, setGithubUser] = useState("abdullahomar1997");
   const [githubRepo, setGithubRepo] = useState([]);
   const [githubToken, setGithubToken] = useState(
-    "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"
+    "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"
   );
   const [searchField, setSearchField] = useState("");
   const [commits, setCommits] = useState([]);
@@ -18,19 +18,17 @@ const Github = () => {
   const [toggle, setToggle] = useState(false);
 
   function handleSubmit(e) {
-    console.log("kkk", githubUser);
     e.preventDefault();
     fetch_user_repos();
     fetch_commits_from_all_repos();
   }
-
-  const fetch_user_repos = () => {
-    return axios({
+  
+  function fetch_user_repos() {
+    axios({
       method: "get",
       url: `https://api.github.com/users/${githubUser}/repos`,
     })
       .then((res) => {
-        console.log("lose", res.data);
         setGithubRepo(res.data);
       })
       .catch((err) => {
@@ -39,11 +37,12 @@ const Github = () => {
         setReadLater([]);
         console.log(err);
       });
-  };
+  }
 
   function fetch_commits_from_all_repos() {
-    return githubRepo.map((repo) => {
+    githubRepo.forEach((repo) => {
       if (repo.size !== 0) {
+        console.log(repo);
         fetch_commits_from_a_repo(repo);
       }
       setCommits(commits);
@@ -61,11 +60,14 @@ const Github = () => {
         repo: repo.name,
       })
       .then((data) => {
-        data.data.map((commit) => {
+        data.data.forEach((commit) => {
           commits.push(commit);
         });
       });
-    setReadLater(JSON.parse(localStorage.getItem("commits")));
+
+    if (localStorage.getItem("commits") !== null) {
+      setReadLater(JSON.parse(localStorage.getItem("commits")));
+    }
   }
 
   return (

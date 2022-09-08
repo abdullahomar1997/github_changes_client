@@ -2,6 +2,8 @@ import React from "react";
 
 const Commits = ({ commits, readLater, searchField }) => {
   const handle = (commit) => {
+    console.log("rl", commit);
+    console.log("read", readLater);
     if (!readLater.includes(commit.sha)) {
       readLater.push(commit.sha);
     }
