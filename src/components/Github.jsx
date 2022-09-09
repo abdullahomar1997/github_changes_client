@@ -8,44 +8,47 @@ import ReadLater from "./ReadLater";
 
 const Github = () => {
   const [githubUser, setGithubUser] = useState("abdullahomar1997");
-  const [githubRepo, setGithubRepo] = useState([]);
-  const [githubToken, setGithubToken] = useState(
-    "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"
-  );
+  const [githubToken, setGithubToken] = useState("");
   const [searchField, setSearchField] = useState("");
   const [commits, setCommits] = useState([]);
   const [readLater, setReadLater] = useState([]);
   const [toggle, setToggle] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState("");
 
   function handleSubmit(e) {
     e.preventDefault();
-    fetch_user_repos();
-    fetch_commits_from_all_repos();
+    fetch_commits();
   }
-  
-  function fetch_user_repos() {
+
+  function fetch_commits() {
+    setLoading(true);
+
     axios({
       method: "get",
       url: `https://api.github.com/users/${githubUser}/repos`,
     })
       .then((res) => {
-        setGithubRepo(res.data);
+        setErrors("");
+        fetch_commits_from_all_repos(res.data);
       })
       .catch((err) => {
-        setGithubRepo([]);
+        setErrors(githubUser + " does not exist");
         setCommits([]);
         setReadLater([]);
+        setLoading(false);
+
         console.log(err);
       });
   }
 
-  function fetch_commits_from_all_repos() {
-    githubRepo.forEach((repo) => {
+  function fetch_commits_from_all_repos(repos) {
+    repos.forEach((repo) => {
       if (repo.size !== 0) {
-        console.log(repo);
         fetch_commits_from_a_repo(repo);
       }
       setCommits(commits);
+      setLoading(false);
     });
   }
 
@@ -63,6 +66,9 @@ const Github = () => {
         data.data.forEach((commit) => {
           commits.push(commit);
         });
+      })
+      .catch((err) => {
+        setErrors("Please Enter Valid Personal Access Token for " + githubUser);
       });
 
     if (localStorage.getItem("commits") !== null) {
@@ -75,18 +81,18 @@ const Github = () => {
       <div className="search_user">
         <input
           value={githubUser}
-          placeholder="Github Username"
+          placeholder="Enter Username"
           onChange={(e) => setGithubUser(e.target.value)}
           className="input_search"
         />
         <input
           value={githubToken}
-          placeholder="Github Token"
+          placeholder="Personal Access Token"
           onChange={(e) => setGithubToken(e.target.value)}
           className="input_search"
         />
         <button onClick={handleSubmit} className="search_button">
-          Search Github User
+          {loading ? "Searching ......" : "Search Github Client"}
         </button>
       </div>
       <div>
@@ -108,19 +114,25 @@ const Github = () => {
           />
         </div>
 
-        {toggle ? (
-          <ReadLater
-            commits={commits}
-            readLater={readLater}
-            searchField={searchField}
-            setReadLater={setReadLater}
-          />
+        {!errors ? (
+          <div>
+            {toggle ? (
+              <ReadLater
+                commits={commits}
+                readLater={readLater}
+                searchField={searchField}
+                setReadLater={setReadLater}
+              />
+            ) : (
+              <Commits
+                commits={commits}
+                readLater={readLater}
+                searchField={searchField}
+              />
+            )}
+          </div>
         ) : (
-          <Commits
-            commits={commits}
-            readLater={readLater}
-            searchField={searchField}
-          />
+          <h1>{errors}</h1>
         )}
       </div>
     </div>
