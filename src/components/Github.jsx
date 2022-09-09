@@ -64,7 +64,10 @@ const Github = () => {
       })
       .then((data) => {
         data.data.forEach((commit) => {
-          commits.push(commit);
+          console.log(commit);
+          if (commit.commit.author.name === githubUser) {
+            commits.push(commit);
+          }
         });
       })
       .catch((err) => {

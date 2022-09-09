@@ -21,7 +21,11 @@ const ReadLater = ({ readLater, commits, searchField, setReadLater }) => {
             .sort((a, b) => {
               return -a.commit.author.date.localeCompare(b.commit.author.date);
             })
-            .filter((search) => search.commit.message.includes(searchField))
+            .filter((search) =>
+              search.commit.message
+                .toLowerCase()
+                .includes(searchField.toLowerCase())
+            )
             .filter((value) => readLater.includes(value.sha))
             .map((commit) => (
               <tr key={commit.sha}>
