@@ -2,11 +2,11 @@ import React from "react";
 
 const Commits = ({ commits, readLater, searchField }) => {
   const handle = (commit) => {
-    console.log("rl", commit);
-    console.log("read", readLater);
     if (!readLater.includes(commit.sha)) {
       readLater.push(commit.sha);
     }
+
+    alert("Added to Read Later Succesfully");
 
     localStorage.setItem("commits", JSON.stringify(readLater));
   };
@@ -16,8 +16,9 @@ const Commits = ({ commits, readLater, searchField }) => {
       <table>
         <tbody>
           <tr>
-            <td className="commit">Commit Message</td>
-            <td className="later heading">Action</td>
+            <td className="commit heading">Commit Message</td>
+            <td className="commit heading">Repository</td>
+            <td className="later action_heading">Action</td>
           </tr>
           {commits
             .sort((a, b) => {
@@ -31,7 +32,13 @@ const Commits = ({ commits, readLater, searchField }) => {
             .map((commit) => (
               <tr key={commit.sha}>
                 <td className="commit">{commit.commit.message}</td>
-                <td className="later" onClick={() => handle(commit)}>
+                <td className="commit">{commit.repo_name}</td>
+                <td
+                  className={
+                    commit.isSavedForLater ? "later unmarked" : "later"
+                  }
+                  onClick={() => handle(commit)}
+                >
                   Save To Read Later
                 </td>
               </tr>

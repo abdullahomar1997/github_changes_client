@@ -37,25 +37,29 @@ const Github = () => {
         setCommits([]);
         setReadLater([]);
         setLoading(false);
-
         console.log(err);
       });
   }
 
   function fetch_commits_from_all_repos(repos) {
+    setCommits([]);
     repos.forEach((repo) => {
       if (repo.size !== 0) {
         fetch_commits_from_a_repo(repo);
       }
-      setCommits(commits);
-      setLoading(false);
     });
+    setCommits(commits);
+    setLoading(false);
   }
 
   async function fetch_commits_from_a_repo(repo) {
     const octokit = new Octokit({
       auth: githubToken,
     });
+
+    if (localStorage.getItem("commits") !== null) {
+      setReadLater(JSON.parse(localStorage.getItem("commits")));
+    }
 
     await octokit
       .request("GET /repos/{owner}/{repo}/commits", {
@@ -64,19 +68,24 @@ const Github = () => {
       })
       .then((data) => {
         data.data.forEach((commit) => {
-          console.log(commit);
           if (commit.commit.author.name === githubUser) {
-            commits.push(commit);
+            var isSavedForLater = false;
+            if (
+              JSON.parse(localStorage.getItem("commits")).includes(commit.sha)
+            ) {
+              isSavedForLater = true;
+            }
+
+            var repo_name = "repo_name";
+            commit.repo_name = repo.name;
+            commit.isSavedForLater = isSavedForLater;
+            setCommits((prev) => [...prev, commit]);
           }
         });
       })
       .catch((err) => {
-        setErrors("Please Enter Valid Personal Access Token for " + githubUser);
+        setErrors(githubUser + " Is not Authenticated");
       });
-
-    if (localStorage.getItem("commits") !== null) {
-      setReadLater(JSON.parse(localStorage.getItem("commits")));
-    }
   }
 
   return (
@@ -99,11 +108,11 @@ const Github = () => {
         </button>
       </div>
       <div>
-        <h1>Latest Changes</h1>
-        <button onClick={() => setToggle(false)} className="search_button">
+        <h2>Latest Changes</h2>
+        <button onClick={() => setToggle(false)} className="menu_button">
           All Changes
         </button>
-        <button onClick={() => setToggle(true)} className="search_button">
+        <button onClick={() => setToggle(true)} className="menu_button">
           Read Later
         </button>
         <div></div>
