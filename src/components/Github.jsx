@@ -76,7 +76,6 @@ const Github = () => {
               isSavedForLater = true;
             }
 
-            var repo_name = "repo_name";
             commit.repo_name = repo.name;
             commit.isSavedForLater = isSavedForLater;
             setCommits((prev) => [...prev, commit]);
